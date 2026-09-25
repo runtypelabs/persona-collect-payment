@@ -1,0 +1,248 @@
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --ink: #1d2327;
+  --muted: #5d676e;
+  --line: #e2e0d8;
+  --accent: #1f5f4a;
+  --ok: #127a4a;
+  --warn: #a15c07;
+  --info: #3b5bab;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font:
+    15px/1.5 -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: var(--accent);
+  color: #fff;
+}
+.brand {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.topbar-note {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+}
+
+.store {
+  overflow: auto;
+  padding: 28px 32px 40px;
+}
+.store h1 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+.lede {
+  margin: 0 0 22px;
+  max-width: 62ch;
+  color: var(--muted);
+}
+
+.catalog {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+}
+.product {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+}
+.product-name {
+  font-weight: 550;
+}
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.price {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.log-panel h2 {
+  font-size: 15px;
+  margin: 0 0 10px;
+}
+.log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.log-empty {
+  padding: 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.log-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+  font-size: 13.5px;
+}
+.log-item:first-child {
+  border-top: 0;
+}
+.log-marker {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-top: 6px;
+  background: var(--info);
+}
+.log-ok .log-marker {
+  background: var(--ok);
+}
+.log-warn .log-marker {
+  background: var(--warn);
+}
+.log-title {
+  font-weight: 550;
+}
+.log-detail {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.log-item time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+
+.chat {
+  min-height: 0;
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.checkout-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(20 24 28 / 0.45);
+  z-index: 10000;
+}
+.checkout-backdrop[hidden] {
+  display: none;
+}
+.checkout-dialog {
+  width: min(440px, 100%);
+  background: var(--surface);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.25);
+}
+.checkout-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.checkout-title {
+  font-weight: 600;
+}
+.checkout-origin {
+  font-size: 12px;
+  color: var(--muted);
+}
+.checkout-close {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.checkout-close svg {
+  width: 16px;
+  height: 16px;
+}
+.checkout-lines {
+  list-style: none;
+  margin: 0;
+  padding: 10px 16px;
+  background: #faf9f6;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+}
+.checkout-lines li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 0;
+}
+#checkout-frame {
+  display: block;
+  width: 100%;
+  height: 440px;
+  border: 0;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 560px;
+  }
+  .store {
+    padding: 20px 16px;
+  }
+  .chat {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+}

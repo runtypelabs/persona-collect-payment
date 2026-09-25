@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Northwind Office Supply</title>
+    <link rel="stylesheet" href="/vendor/persona/widget.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/vendor/persona/index.global.js"></script>
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">Northwind Office Supply</div>
+      <div class="topbar-note">Business accounts · Net 30 or card</div>
+    </header>
+    <div class="layout">
+      <main class="store">
+        <h1>Reorder supplies by chat</h1>
+        <p class="lede">
+          Tell the assistant what you need. When you are ready to pay, it opens a secure checkout
+          from the payment provider. Card details go straight to the provider, never through the
+          assistant.
+        </p>
+        <ul class="catalog" id="catalog"></ul>
+
+        <section class="log-panel" aria-labelledby="log-heading">
+          <h2 id="log-heading">What just happened</h2>
+          <ol class="log" id="log">
+            <li class="log-empty">Place an order in the chat to see each step here.</li>
+          </ol>
+        </section>
+      </main>
+      <aside class="chat" id="chat" aria-label="Order assistant"></aside>
+    </div>
+
+    <div class="checkout-backdrop" id="checkout" hidden>
+      <div class="checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+        <div class="checkout-head">
+          <div>
+            <div class="checkout-title" id="checkout-title">Secure checkout</div>
+            <div class="checkout-origin" id="checkout-origin"></div>
+          </div>
+          <button
+            type="button"
+            class="checkout-close"
+            id="checkout-close"
+            aria-label="Close checkout"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+        <ul class="checkout-lines" id="checkout-lines"></ul>
+        <iframe id="checkout-frame" title="Payment provider checkout"></iframe>
+      </div>
+    </div>
+  </body>
+</html>

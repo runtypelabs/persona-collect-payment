@@ -1,0 +1,17 @@
+{
+  "name": "runtype-persona-collect-payment",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Demo: a Runtype agent in a Persona chat collects a payment through a provider-hosted checkout iframe.",
+  "scripts": {
+    "setup:runtype": "node setup-runtype.mjs",
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@runtypelabs/persona": "4.22.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

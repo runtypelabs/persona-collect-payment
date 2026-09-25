@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acme Pay checkout</title>
+    <style>
+      :root {
+        --ink: #1b1f3b;
+        --muted: #636a86;
+        --line: #dfe2ee;
+        --brand: #4b3fd6;
+        --brand-ink: #ffffff;
+        --ok: #127a4a;
+        --bad: #b42318;
+        --field: #f7f8fc;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font:
+          15px/1.45 -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        color: var(--ink);
+        background: #ffffff;
+      }
+      main {
+        padding: 22px 24px 18px;
+      }
+      .merchant {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .amount {
+        font-size: 30px;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+        margin: 2px 0 18px;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 550;
+        margin: 12px 0 6px;
+      }
+      input {
+        width: 100%;
+        font: inherit;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--field);
+        color: var(--ink);
+      }
+      input:focus {
+        outline: 2px solid color-mix(in srgb, var(--brand) 40%, transparent);
+        border-color: var(--brand);
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      button {
+        width: 100%;
+        margin-top: 20px;
+        padding: 12px;
+        font: inherit;
+        font-weight: 600;
+        border: 0;
+        border-radius: 8px;
+        background: var(--brand);
+        color: var(--brand-ink);
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: progress;
+      }
+      .error {
+        color: var(--bad);
+        font-size: 13px;
+        margin-top: 12px;
+        min-height: 18px;
+      }
+      .done {
+        text-align: center;
+        padding: 36px 0 20px;
+      }
+      .done svg {
+        width: 52px;
+        height: 52px;
+        color: var(--ok);
+      }
+      .done h2 {
+        margin: 12px 0 4px;
+        font-size: 20px;
+      }
+      .done p {
+        margin: 0;
+        color: var(--muted);
+      }
+      footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border-top: 1px solid var(--line);
+        padding: 12px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      footer strong {
+        color: var(--brand);
+      }
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section id="form-view">
+        <div class="merchant" id="merchant"></div>
+        <div class="amount" id="amount"></div>
+        <form id="pay-form" novalidate>
+          <label for="card">Card number</label>
+          <input
+            id="card"
+            name="card"
+            inputmode="numeric"
+            autocomplete="cc-number"
+            placeholder="1234 1234 1234 1234"
+          />
+          <div class="row">
+            <div>
+              <label for="exp">Expiry</label>
+              <input id="exp" name="exp" autocomplete="cc-exp" placeholder="MM / YY" />
+            </div>
+            <div>
+              <label for="cvc">CVC</label>
+              <input
+                id="cvc"
+                name="cvc"
+                inputmode="numeric"
+                autocomplete="cc-csc"
+                placeholder="123"
+              />
+            </div>
+          </div>
+          <label for="name">Name on card</label>
+          <input id="name" name="name" autocomplete="cc-name" placeholder="Full name" />
+          <button id="pay" type="submit"></button>
+          <div class="error" id="error" role="alert"></div>
+        </form>
+      </section>
+      <section id="done-view" class="done" hidden>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="m7.5 12.5 3 3 6-6.5" />
+        </svg>
+        <h2>Payment complete</h2>
+        <p id="done-detail"></p>
+      </section>
+    </main>
+    <footer>
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        aria-hidden="true"
+      >
+        <rect x="4" y="11" width="16" height="10" rx="2" />
+        <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+      </svg>
+      Secured by <strong>Acme Pay</strong> · test mode
+    </footer>
+    <script>
+      const CHECKOUT = '__CHECKOUT__'
+      const money = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: CHECKOUT.currency.toUpperCase(),
+      })
+      const total = money.format(CHECKOUT.amount / 100)
+
+      document.getElementById('merchant').textContent = CHECKOUT.description
+      document.getElementById('amount').textContent = total
+      const payButton = document.getElementById('pay')
+      payButton.textContent = `Pay ${total}`
+
+      function notifyMerchant(status) {
+        window.parent.postMessage(
+          { source: 'acmepay', type: 'payment_attempt', status },
+          CHECKOUT.merchantOrigin
+        )
+      }
+
+      document.getElementById('pay-form').addEventListener('submit', async (event) => {
+        event.preventDefault()
+        const error = document.getElementById('error')
+        error.textContent = ''
+        payButton.disabled = true
+        payButton.textContent = 'Processing…'
+        const res = await fetch('/checkout/confirm', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            clientSecret: CHECKOUT.clientSecret,
+            cardNumber: document.getElementById('card').value,
+          }),
+        })
+        const result = await res.json()
+        if (result.status === 'succeeded') {
+          document.getElementById('form-view').hidden = true
+          document.getElementById('done-view').hidden = false
+          document.getElementById('done-detail').textContent =
+            `${total} paid to ${CHECKOUT.description}`
+        } else {
+          error.textContent = 'Your card was declined. Try another card.'
+          payButton.disabled = false
+          payButton.textContent = `Pay ${total}`
+        }
+        notifyMerchant(result.status === 'succeeded' ? 'succeeded' : 'declined')
+      })
+    </script>
+  </body>
+</html>
