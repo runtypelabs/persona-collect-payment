@@ -15,24 +15,39 @@ Replace it with the real provider's SDK to productionize.
 
 ## Sequence
 
-```
-Customer        Persona widget + page          Merchant server             Runtype API          Acme Pay (provider)
-   |  "buy 3 reams"  |                                |                          |                        |
-   |---------------->|  POST /api/chat/dispatch  ---->|  POST /v1/dispatch  ---->|                        |
-   |                 |  (page tool: collect_payment)  |  (agent + prompt set     |  model calls           |
-   |                 |<------------ SSE: await collect_payment({items}) --------|  collect_payment       |
-   |                 |  POST /api/checkout-sessions ->|  price from catalog      |                        |
-   |                 |                                |  POST /v1/payment_intents ----------------------->|
-   |                 |<---- checkoutUrl --------------|                                                   |
-   |  pays in iframe |  <iframe src=checkoutUrl> ----------------------------------------------------->   |
-   |---------------->|                                |<------ signed webhook payment_intent.succeeded ---|
-   |                 |                                |                          |<-- same event, signed --|
-   |                 |                                |                          |  webhook surface runs   |
-   |                 |                                |                          |  "record payment" flow  |
-   |                 |<--- postMessage(result) --------------------------------------------------------- |
-   |                 |  GET /api/checkout-sessions/:id -> GET /v1/payment_intents/:id (server-side check) |
-   |                 |  POST /api/chat/dispatch/resume -> /v1/dispatch/resume -->|                        |
-   |<----------------|<--------------- SSE: "Payment received, order NW-…" ------|                        |
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Customer
+    participant W as Persona widget + page
+    participant M as Merchant server
+    participant R as Runtype API
+    participant P as Acme Pay (provider)
+
+    C->>W: "buy 3 reams"
+    W->>M: POST /api/chat/dispatch<br/>(page tool: collect_payment)
+    M->>R: POST /v1/dispatch<br/>(agent + prompt set)
+    Note over R: model calls collect_payment
+    R-->>W: SSE: await collect_payment({items})
+
+    W->>M: POST /api/checkout-sessions
+    Note over M: price from catalog
+    M->>P: POST /v1/payment_intents
+    M-->>W: checkoutUrl
+
+    W->>P: iframe src=checkoutUrl
+    C->>W: pays in iframe
+    P-->>M: signed webhook payment_intent.succeeded
+    P-->>R: same event, signed
+    Note over R: webhook surface runs<br/>"record payment" flow
+    P-->>W: postMessage(result)
+
+    W->>M: GET /api/checkout-sessions/:id
+    M->>P: GET /v1/payment_intents/:id<br/>(server-side check)
+    W->>M: POST /api/chat/dispatch/resume
+    M->>R: POST /v1/dispatch/resume
+    R-->>W: SSE: "Payment received, order NW-…"
+    W-->>C: Payment received, order NW-…
 ```
 
 ## What each piece shows
